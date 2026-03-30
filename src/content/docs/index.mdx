@@ -1,0 +1,34 @@
+---
+title: FlintDB
+description: A modern embedded analytical database. JSON-native, analytics built-in, no SQL required.
+template: splash
+hero:
+  tagline: "SQLite's simplicity + columnar analytics + statistical functions + vector search. Query is Data."
+  actions:
+    - text: Get Started
+      link: /getting-started/introduction/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/orchardworks/flintdb
+      variant: minimal
+      icon: github
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why FlintDB?
+
+<CardGrid>
+  <Card title="JSON-Native" icon="document">
+    Store and query JSON documents directly. No schema definitions required — flexible input, strict output.
+  </Card>
+  <Card title="Built-in Analytics" icon="bars">
+    Aggregations, window functions, statistical analysis, and finance indicators out of the box.
+  </Card>
+  <Card title="No SQL Required" icon="pencil">
+    Queries are JSON objects, not SQL strings. No parser, no DSL — Query is Data.
+  </Card>
+  <Card title="Embeddable" icon="puzzle">
+    In-process native binding (~2 us/get) or IPC daemon mode. Works with Node.js and Python.
+  </Card>
+</CardGrid>

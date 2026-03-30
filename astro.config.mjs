@@ -4,8 +4,7 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	site: process.env.SITE || 'https://orchardworks.github.io',
-	base: process.env.BASE || '/flintdb-docs',
+	site: 'https://docs.flintdb.dev',
 	integrations: [
 		starlight({
 			title: 'FlintDB',

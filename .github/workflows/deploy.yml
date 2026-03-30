@@ -24,9 +24,6 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build
-        env:
-          SITE: https://orchardworks.github.io
-          BASE: /flintdb-docs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

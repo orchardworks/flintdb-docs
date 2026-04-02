@@ -3,7 +3,7 @@ title: Introduction
 description: What is FlintDB and why use it.
 ---
 
-FlintDB is a modern embedded analytical database designed for applications that need local-first data storage with powerful analytics — without the complexity of SQL.
+FlintDB is an embedded JSON-native database with built-in analytics and vector search. Store JSON, query it, analyze it — all in-engine. No daemon, no schema, no ETL.
 
 ## Key Concepts
 

@@ -1,9 +1,9 @@
 ---
 title: FlintDB
-description: A modern embedded analytical database. JSON-native, analytics built-in, no SQL required.
+description: JSON-native embedded database with built-in analytics and vector search. No daemon, no schema, no ETL.
 template: splash
 hero:
-  tagline: "SQLite's simplicity + columnar analytics + statistical functions + vector search. Query is Data."
+  tagline: "The local database that should have existed. Store JSON, query it, analyze it — all in-engine."
   actions:
     - text: Get Started
       link: /getting-started/introduction/
@@ -20,15 +20,15 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 <CardGrid>
   <Card title="JSON-Native" icon="document">
-    Store and query JSON documents directly. No schema definitions required — flexible input, strict output.
+    Store and query JSON documents directly. No schema definitions, no migrations — your data's shape is your schema.
   </Card>
   <Card title="Built-in Analytics" icon="bars">
-    Aggregations, window functions, statistical analysis, and finance indicators out of the box.
+    avg, stddev, EMA, percentile, correlation — computed inside the engine. No Pandas, no ETL pipeline.
   </Card>
-  <Card title="No SQL Required" icon="pencil">
-    Queries are JSON objects, not SQL strings. No parser, no DSL — Query is Data.
+  <Card title="Query is Data" icon="pencil">
+    Queries are plain JSON objects, not SQL strings. No parser, no DSL — just objects in, results out.
   </Card>
-  <Card title="Embeddable" icon="puzzle">
-    In-process native binding (~2 us/get) or IPC daemon mode. Works with Node.js and Python.
+  <Card title="Vector Search" icon="puzzle">
+    Store embeddings alongside your documents. Cosine and L2 nearest-neighbor search built in.
   </Card>
 </CardGrid>

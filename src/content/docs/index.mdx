@@ -58,15 +58,6 @@ No `await`, no schema, no server — just `npm install` and go.
   </Card>
 </CardGrid>
 
-## Two Access Modes
-
-| Mode | Import | Latency | Use Case |
-|------|--------|---------|----------|
-| **Native** | `FlintDB.open()` | ~2 µs/get | In-process, sync, maximum performance |
-| **IPC** | `await open()` | ~50 µs/get | Multi-process, async, daemon-based |
-
-Both modes share the same Rust engine underneath.
-
 ## Architecture
 
 FlintDB is built in Rust with:

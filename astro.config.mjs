@@ -25,6 +25,15 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Examples',
+					items: [
+						{ label: 'Stock Analytics', slug: 'examples/stock-analytics' },
+						{ label: 'RAG Search', slug: 'examples/rag-search' },
+						{ label: 'Log Analyzer', slug: 'examples/log-analyzer' },
+						{ label: 'Sensor Dashboard', slug: 'examples/sensor-dashboard' },
+					],
+				},
+				{
 					label: 'API Reference',
 					autogenerate: { directory: 'reference' },
 				},

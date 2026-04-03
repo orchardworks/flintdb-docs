@@ -1,34 +1,83 @@
 ---
-title: FlintDB
-description: JSON-native embedded database with built-in analytics and vector search. No daemon, no schema, no ETL.
-template: splash
-hero:
-  tagline: "The local database that should have existed. Store JSON, query it, analyze it — all in-engine."
-  actions:
-    - text: Get Started
-      link: /getting-started/introduction/
-      icon: right-arrow
-    - text: View on GitHub
-      link: https://github.com/orchardworks/flintdb
-      variant: minimal
-      icon: github
+title: Introduction
+description: What is FlintDB and why use it.
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## Why FlintDB?
+FlintDB is an embedded JSON-native database with built-in analytics and vector search. Store JSON, query it, analyze it — all in-engine. No daemon, no schema, no ETL.
+
+## Install
+
+```bash
+npm install flintdb
+```
+
+## Quick Example
+
+```js
+import { FlintDB, col, avg } from "flintdb";
+
+const db = FlintDB.open("./data");
+
+db.put("sensors", { device: "A", temp: 22.5, ts: "2024-09-01T00:00:00Z" });
+db.put("sensors", { device: "A", temp: 23.1, ts: "2024-09-01T00:05:00Z" });
+db.put("sensors", { device: "B", temp: 18.0, ts: "2024-09-01T00:00:00Z" });
+
+const result = db
+  .from("sensors")
+  .groupBy("device")
+  .select({
+    device: col("device"),
+    avg_temp: avg("temp"),
+  })
+  .run();
+
+console.log(result.rows);
+// [{ device: "A", avg_temp: 22.8 }, { device: "B", avg_temp: 18.0 }]
+
+db.close();
+```
+
+No `await`, no schema, no server — just `npm install` and go.
+
+## Key Concepts
 
 <CardGrid>
   <Card title="JSON-Native" icon="document">
     Store and query JSON documents directly. No schema definitions, no migrations — your data's shape is your schema.
   </Card>
   <Card title="Built-in Analytics" icon="bars">
-    avg, stddev, EMA, percentile, correlation — computed inside the engine. No Pandas, no ETL pipeline.
+    avg, stddev, EMA, percentile, Bollinger Bands, RSI, MACD — computed inside the engine. No Pandas, no ETL pipeline.
   </Card>
   <Card title="Query is Data" icon="pencil">
     Queries are plain JSON objects, not SQL strings. No parser, no DSL — just objects in, results out.
   </Card>
   <Card title="Vector Search" icon="puzzle">
-    Store embeddings alongside your documents. Cosine and L2 nearest-neighbor search built in.
+    Store embeddings alongside your documents. Cosine and L2 nearest-neighbor search built in. No separate vector DB.
   </Card>
 </CardGrid>
+
+## Two Access Modes
+
+| Mode | Import | Latency | Use Case |
+|------|--------|---------|----------|
+| **Native** | `FlintDB.open()` | ~2 µs/get | In-process, sync, maximum performance |
+| **IPC** | `await open()` | ~50 µs/get | Multi-process, async, daemon-based |
+
+Both modes share the same Rust engine underneath.
+
+## Architecture
+
+FlintDB is built in Rust with:
+
+- **redb** — mmap-backed, ACID, crash-safe storage via Copy-on-Write
+- **Lazy loading** — collections deserialized on first access
+- **Columnar cache** — dense f64 arrays built lazily per field for fast analytics
+- **Hash & BTree indexes** — auto-maintained on mutations
+
+## Next Steps
+
+- [Quick Start](/getting-started/quickstart/) — set up and run your first query
+- [Examples](/examples/stock-analytics/) — real-world use cases
+- [API Reference](/reference/node-sdk/) — full SDK documentation

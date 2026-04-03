@@ -26,7 +26,7 @@ npm install flintdb
 Generate realistic stock price data and bulk-insert it:
 
 ```js
-import { open } from "flintdb";
+import { FlintDB } from "flintdb";
 
 function generatePrices(ticker, startPrice, days) {
   const docs = [];
@@ -58,17 +58,17 @@ function generatePrices(ticker, startPrice, days) {
   return docs;
 }
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
 const aapl = generatePrices("AAPL", 185, 400);
 const googl = generatePrices("GOOGL", 140, 400);
-await db.putBatch("prices", [...aapl, ...googl]);
+db.putBatch("prices", [...aapl, ...googl]);
 
 // Create indexes for fast filtering
-await db.createIndex("prices", "ticker");
-await db.createIndex("prices", "date", "btree");
+db.createIndex("prices", "ticker");
+db.createIndex("prices", "date", "BTree");
 
-await db.close();
+db.close();
 ```
 
 ## Step 2: Per-ticker summary
@@ -76,11 +76,11 @@ await db.close();
 GroupBy with multiple aggregate functions in a single query:
 
 ```js
-import { open, col, avg, stddev, min, max, sum } from "flintdb";
+import { FlintDB, col, avg, stddev, min, max, sum } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
-const summary = await db
+const summary = db
   .from("prices")
   .groupBy("ticker")
   .select({
@@ -106,11 +106,11 @@ console.log(summary.rows);
 20-day SMA and EMA using window functions:
 
 ```js
-import { open, col, avg, ema } from "flintdb";
+import { FlintDB, col, avg, ema } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
-const result = await db
+const result = db
   .from("prices")
   .where({ ticker: "AAPL" })
   .window({ orderBy: "date", rows: 20 })
@@ -128,11 +128,11 @@ const result = await db
 ## Step 4: Bollinger Bands
 
 ```js
-import { open, col, bollinger } from "flintdb";
+import { FlintDB, col, bollinger } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
-const bands = await db
+const bands = db
   .from("prices")
   .where({ ticker: "GOOGL" })
   .window({ orderBy: "date", rows: 20 })
@@ -151,12 +151,12 @@ const bands = await db
 ## Step 5: RSI and MACD
 
 ```js
-import { open, col, rsi, macd } from "flintdb";
+import { FlintDB, col, rsi, macd } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
 // RSI(14)
-const rsiResult = await db
+const rsiResult = db
   .from("prices")
   .where({ ticker: "AAPL" })
   .window({ orderBy: "date", rows: 14 })
@@ -170,7 +170,7 @@ const rsiResult = await db
   .run();
 
 // MACD(12, 26, 9)
-const macdResult = await db
+const macdResult = db
   .from("prices")
   .where({ ticker: "AAPL" })
   .window({ orderBy: "date", rows: 26 })

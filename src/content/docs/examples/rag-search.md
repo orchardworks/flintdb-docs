@@ -24,7 +24,7 @@ export OPENAI_API_KEY=sk-...
 ## Step 1: Embed and store articles
 
 ```js
-import { open } from "flintdb";
+import { FlintDB } from "flintdb";
 import OpenAI from "openai";
 
 const openai = new OpenAI();
@@ -53,7 +53,7 @@ const articles = [
   // ... more articles
 ];
 
-// Generate embeddings
+// Generate embeddings (OpenAI call is async)
 const texts = articles.map((a) => `${a.title}\n${a.content}`);
 const response = await openai.embeddings.create({
   model: "text-embedding-3-small",
@@ -62,17 +62,17 @@ const response = await openai.embeddings.create({
 const embeddings = response.data.map((d) => d.embedding);
 
 // Store articles with their embedding vectors
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
 for (let i = 0; i < articles.length; i++) {
-  await db.put("articles", {
+  db.put("articles", {
     ...articles[i],
     embedding: embeddings[i],
   });
 }
 
-await db.createIndex("articles", "category");
-await db.close();
+db.createIndex("articles", "category");
+db.close();
 ```
 
 The key insight: **the embedding lives in the same document** as the title, content, and category. No need to sync between a document store and a separate vector DB.
@@ -80,32 +80,30 @@ The key insight: **the embedding lives in the same document** as the title, cont
 ## Step 2: Search
 
 ```js
-import { open } from "flintdb";
+import { FlintDB } from "flintdb";
 import OpenAI from "openai";
 
 const openai = new OpenAI();
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 const query = "How do I build a semantic search system?";
 
-// Embed the query
+// Embed the query (OpenAI call is async)
 const response = await openai.embeddings.create({
   model: "text-embedding-3-small",
   input: query,
 });
 const queryVector = response.data[0].embedding;
 
-// Find similar articles
-const results = await db
-  .from("articles")
-  .nearVector("embedding", queryVector)
-  .topK(5)
-  .metric("cosine")
-  .run();
+// Find similar articles — sync, no await
+const results = db.nearVector("articles", "embedding", queryVector, {
+  topK: 5,
+  metric: "cosine",
+});
 
-for (const result of results) {
-  console.log(`[${result.score.toFixed(4)}] ${result.data.title}`);
-  console.log(`  ${result.data.content.slice(0, 100)}...`);
+for (const row of results.rows) {
+  console.log(`[${row.score.toFixed(4)}] ${row.data.title}`);
+  console.log(`  ${row.data.content.slice(0, 100)}...`);
 }
 ```
 
@@ -114,13 +112,11 @@ for (const result of results) {
 Pre-filter by category so only relevant documents are searched:
 
 ```js
-const results = await db
-  .from("articles")
-  .nearVector("embedding", queryVector)
-  .topK(5)
-  .metric("cosine")
-  .where({ category: "tech" })  // only search tech articles
-  .run();
+const results = db.nearVector("articles", "embedding", queryVector, {
+  topK: 5,
+  metric: "cosine",
+  filter: { op: "eq", field: "category", value: "tech" },
+});
 ```
 
 The filter runs **before** the vector search, narrowing the candidate set efficiently.

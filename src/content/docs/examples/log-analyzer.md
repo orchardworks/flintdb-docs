@@ -26,12 +26,12 @@ npm install flintdb
 The key point: **each log type has a different shape**, but they all go into the same collection.
 
 ```js
-import { open } from "flintdb";
+import { FlintDB } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
 // HTTP request log
-await db.put("logs", {
+db.put("logs", {
   type: "http",
   timestamp: "2024-06-01T10:30:00Z",
   method: "GET",
@@ -42,7 +42,7 @@ await db.put("logs", {
 });
 
 // Error log — different shape, has stack trace, no latency
-await db.put("logs", {
+db.put("logs", {
   type: "error",
   timestamp: "2024-06-01T10:31:00Z",
   error_type: "TypeError",
@@ -52,7 +52,7 @@ await db.put("logs", {
 });
 
 // Auth event — different shape again
-await db.put("logs", {
+db.put("logs", {
   type: "auth",
   timestamp: "2024-06-01T10:32:00Z",
   action: "login_failed",
@@ -61,8 +61,8 @@ await db.put("logs", {
   success: false,
 });
 
-await db.createIndex("logs", "type");
-await db.createIndex("logs", "timestamp", "btree");
+db.createIndex("logs", "type");
+db.createIndex("logs", "timestamp", "BTree");
 ```
 
 No schema definition — FlintDB accepts any JSON shape.
@@ -70,7 +70,7 @@ No schema definition — FlintDB accepts any JSON shape.
 ## Step 2: Inspect the collection
 
 ```js
-const desc = await db.describe("logs");
+const desc = db.describe("logs");
 console.log(desc.fields);
 // Shows the union of all fields across all document shapes:
 // { type, timestamp, method, path, status, latency_ms, user_agent,
@@ -80,11 +80,11 @@ console.log(desc.fields);
 ## Step 3: Latency analysis by endpoint
 
 ```js
-import { open, col, avg, count, percentile, max } from "flintdb";
+import { FlintDB, col, avg, count, percentile, max } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
-const latency = await db
+const latency = db
   .from("logs")
   .where({ type: "http" })
   .groupBy("path")
@@ -102,7 +102,7 @@ const latency = await db
 ## Step 4: Find slow requests
 
 ```js
-const slow = await db
+const slow = db
   .from("logs")
   .where({ type: "http", latency_ms: { gt: 1000 } })
   .select({
@@ -120,7 +120,7 @@ const slow = await db
 ## Step 5: Failed login attempts
 
 ```js
-const failedLogins = await db
+const failedLogins = db
   .from("logs")
   .where({ type: "auth", action: "login_failed" })
   .groupBy("user_id")

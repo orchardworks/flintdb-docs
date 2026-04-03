@@ -26,7 +26,7 @@ npm install flintdb
 Generate readings from 3 devices — temperature, humidity, pressure every 5 minutes:
 
 ```js
-import { open } from "flintdb";
+import { FlintDB } from "flintdb";
 
 function generateSensorData(deviceId, days) {
   const docs = [];
@@ -60,26 +60,26 @@ function generateSensorData(deviceId, days) {
   return docs;
 }
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
 for (const device of ["sensor-A", "sensor-B", "sensor-C"]) {
   const data = generateSensorData(device, 7);
-  await db.putBatch("sensors", data);
+  db.putBatch("sensors", data);
 }
 
-await db.createIndex("sensors", "device_id");
-await db.createIndex("sensors", "timestamp", "btree");
-await db.close();
+db.createIndex("sensors", "device_id");
+db.createIndex("sensors", "timestamp", "BTree");
+db.close();
 ```
 
 ## Step 2: Device overview
 
 ```js
-import { open, col, avg, stddev, min, max, count } from "flintdb";
+import { FlintDB, col, avg, stddev, min, max, count } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
-const overview = await db
+const overview = db
   .from("sensors")
   .groupBy("device_id")
   .select({
@@ -100,11 +100,11 @@ const overview = await db
 Noisy sensor data smoothed with a 12-point exponential moving average:
 
 ```js
-import { open, col, ema } from "flintdb";
+import { FlintDB, col, ema } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
-const trend = await db
+const trend = db
   .from("sensors")
   .where({ device_id: "sensor-A" })
   .window({ orderBy: "timestamp", rows: 12 })
@@ -123,11 +123,11 @@ const trend = await db
 Query only the **last 24 hours** of data using `last()`:
 
 ```js
-import { open, col, avg, count, percentile } from "flintdb";
+import { FlintDB, col, avg, count, percentile } from "flintdb";
 
-const db = await open("./data");
+const db = FlintDB.open("./data");
 
-const recent = await db
+const recent = db
   .from("sensors")
   .where({ device_id: "sensor-B" })
   .last(1, "days", "timestamp")
@@ -146,7 +146,7 @@ const recent = await db
 Find all readings above a threshold:
 
 ```js
-const alerts = await db
+const alerts = db
   .from("sensors")
   .where({ temperature: { gt: 35 } })
   .select({

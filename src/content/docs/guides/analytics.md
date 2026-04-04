@@ -45,7 +45,7 @@ Built-in statistical analysis:
 - **Correlation**: pearson, covariance
 - **Regression**: linear regression
 
-## Finance Functions (Pro)
+## Finance Functions
 
 Specialized indicators for financial data:
 
@@ -53,7 +53,3 @@ Specialized indicators for financial data:
 - **Volatility**: Bollinger Bands, ATR
 - **Momentum**: RSI, MACD, Stochastic
 - **Volume**: OBV, VWAP
-
-:::note
-Finance functions require a Pro license key.
-:::
